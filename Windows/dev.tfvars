@@ -1,0 +1,9 @@
+ResourceGroupName = "Ram-tfrg1"
+ResourceLocation  = "East US"
+Vnet_CIDR         = ["10.0.0.0/16"]
+InstanceCount     = 1
+Vnet_Name         = "Ram-vnet_w1"
+Subnet_Name       = "Ram-subnet-w1"
+Nic_Name_Prefix   = "Ram_NIC"
+PIP_Name_Prefix   = "Ram_PIP"
+VM_Name_Prefix    = "Ram-VM-W"
