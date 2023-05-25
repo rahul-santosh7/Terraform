@@ -16,6 +16,7 @@ terraform plan: which save the plan of the configuration
 terraform destroy : to destroy the existing resources and it takes input from the state file
 terraform apply: which will apply the configuration
 terraform init --upgrade: This can be used when you update the hashicorp version and also to clear initilization cache.
+teerraform show: used to show the current configuratin from state file.
 
  Few important blocks
 ------------------------
