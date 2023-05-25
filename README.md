@@ -43,10 +43,10 @@ Before using cli
 
 
 provider "azurerm" {
-  client_id       = "104bfe2c-13de-4330-a305-0dca478e43c2" 
-  tenant_id       = "e8392f38-922d-4398-833d-329567533392" 
-  subscription_id = "fd096583-2aad-460b-8eba-1f86d21a96c2" 
-  client_secret   = "VR48Q~EefkRT1AAuXYdMYLe.g5cJHkKDfH5w3acE"
+  client_id       = "" 
+  tenant_id       = ""
+  subscription_id = ""
+  client_secret   = ""
   features {}
 }
 
