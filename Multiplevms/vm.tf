@@ -6,18 +6,46 @@ terraform {
     }
   }
 }
+terraform {
+ backend "azurerm" {
+
+ resource_group_name= "NetworkWatcherRG"
+storage_account_name= "kstg123"
+container_name = "rahul"
+key= "terraform.tfstate"
+ }
+}
 
 provider "azurerm" {
-client_id = "a6c6163b-607b-467d-9c3e-09dd4da70294"
-tenant_id = "0c45565b-c823-4469-9b6b-30989afb7a2e"
-subscription_id = "738dfdc6-f0bd-407d-b899-c56640f7ce02"
-client_secret = "mtc8Q~UqkUy-EXMS6WcjKm3ayv8p5J5EI5aQ.crC"
-  features {}
+  tenant_id = "0c45565b-c823-4469-9b6b-30989afb7a2e"
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+   }
+  }
+
+}
+data "azurerm_client_config" "current" {
+
+  
+}
+
+resource "azurerm_resource_group" "newresource123" {
+  name     = var.resource_group_name
+  location = var.location
+
+  tags = {
+    Environment = "Testing"
+    Department  = "Bench"
+  }
+ 
+
 }
 
 variable "resource_group_name" {
   description = "Name of the resource group"
   default     = "newresource123"
+  
 }
 
 variable "location" {
@@ -71,16 +99,22 @@ variable "vms" {
     }
   ]
 }
-resource "azurerm_resource_group" "newresource123" {
-  name     = var.resource_group_name
-  location = var.location
 
-}
 resource "azurerm_virtual_network" "network" {
   name                = "my-virtual-network"
   address_space       = ["10.0.0.0/16"]
   location            = var.location
   resource_group_name = var.resource_group_name
+  depends_on = [
+    azurerm_key_vault.example,
+    azurerm_resource_group.newresource123
+  ]
+
+   tags = {
+    Environment = "Testing"
+    Department  = "Bench"
+  }
+ 
   
 }
 
@@ -90,6 +124,11 @@ resource "azurerm_subnet" "subnets" {
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.network.name
   address_prefixes     = ["10.0.${count.index}.0/24"]
+  depends_on = [
+    azurerm_key_vault.example,
+    azurerm_resource_group.newresource123
+  ]
+
   
 }
 
@@ -98,6 +137,17 @@ resource "azurerm_network_security_group" "security_groups" {
   name                = var.vms[count.index].nsg_name
   location            = var.location
   resource_group_name = var.resource_group_name
+  depends_on = [
+    azurerm_key_vault.example,
+    azurerm_resource_group.newresource123,
+    azurerm_network_interface.nics
+  ]
+
+   tags = {
+    Environment = "Testing"
+    Department  = "Bench"
+  }
+ 
   
 }
 
@@ -114,6 +164,16 @@ resource "azurerm_network_interface" "nics" {
     private_ip_address_allocation = "Dynamic"
     
   }
+  depends_on = [
+    azurerm_key_vault.example,
+    azurerm_resource_group.newresource123
+  ]
+
+   tags = {
+    Environment = "Testing"
+    Department  = "Bench"
+  }
+ 
   
  
 }
@@ -150,11 +210,85 @@ resource "azurerm_virtual_machine" "vms" {
   os_profile {
     computer_name  = var.vms[count.index].name
     admin_username = "adminuser"
-    admin_password = "Password123!"
+    admin_password = azurerm_key_vault_secret.example.value
   }
 
   os_profile_linux_config {
     disable_password_authentication = false
   }
+   tags = {
+    Environment = "Testing"
+    Department  = "Bench"
+  }
+ 
+  depends_on = [
+    azurerm_key_vault.example,
+    azurerm_resource_group.newresource123,
+    azurerm_network_interface.nics
+  ]
   
 }
+
+resource "azurerm_key_vault" "example" {
+  name                        = "vmkeyvalut23"
+  location                    = var.location
+  resource_group_name         = var.resource_group_name
+  enabled_for_disk_encryption = true
+  tenant_id                   = data.azurerm_client_config.current.tenant_id
+  soft_delete_retention_days  = 7
+  purge_protection_enabled    = false
+
+  sku_name = "standard"
+
+  access_policy {
+    tenant_id = data.azurerm_client_config.current.tenant_id
+    object_id = data.azurerm_client_config.current.object_id
+
+    key_permissions = [
+      "Get","Create","Delete","List","Import"
+    ]
+
+    secret_permissions = [
+      "Get","Set","List","Delete","Restore","Recover","Purge"
+    ]
+
+    storage_permissions = [
+      "Get","Recover","Set"
+    ]
+
+    
+  }
+  depends_on = [
+      azurerm_resource_group.newresource123
+    ]
+
+     tags = {
+    Environment = "Testing"
+    Department  = "Bench"
+  }
+ 
+}
+
+resource "random_string" "secret" {
+  length  = 16
+  special = true
+}
+
+
+resource "azurerm_key_vault_secret" "example" {
+  name         = "vmsecret"
+  value        = random_string.secret.result
+  key_vault_id = azurerm_key_vault.example.id
+  depends_on = [
+    azurerm_key_vault.example,
+    azurerm_resource_group.newresource123
+  ]
+}
+
+
+
+
+
+
+
+
