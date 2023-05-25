@@ -36,18 +36,42 @@ key= "terraform.tfstate"
 
 Provider
 ----------
-The provider block provide the neccsary information about the sub,tenant,client,secret ids of the account and its not good practise to 
+The provider block provide the neccsary information about the sub,tenant,client,secret ids of the account and its not good practise to share the info in the terraform files to avoid that we can use azure cli and ignore that info as below.
+
+Before using cli
+---------------
+
+
+provider "azurerm" {
+  client_id       = "104bfe2c-13de-4330-a305-0dca478e43c2" 
+  tenant_id       = "e8392f38-922d-4398-833d-329567533392" 
+  subscription_id = "fd096583-2aad-460b-8eba-1f86d21a96c2" 
+  client_secret   = "VR48Q~EefkRT1AAuXYdMYLe.g5cJHkKDfH5w3acE"
+  features {}
+}
+
+After using the cli
+---------------------
 
 provider "azurerm" {
   tenant_id = "0c45565b-c823-4469-9b6b-30989afb7a2e"
   features {
     resource_group {
-      prevent_deletion_if_contains_resources = false
+      prevent_deletion_if_contains_resources = false   # If you want to delete some unused resources then you can use this flag in features block.
    }
   }
 
-}
-data "azurerm_client_config" "current" {
 
-  
+Data block
+--------------
+The data block is used to get the data like current configuration or subcription level information like below.
+
+data "azurerm_client_config" "current" {
+}
+
+usage
+---------
+access_policy {
+    tenant_id = data.azurerm_client_config.current.tenant_id
+    object_id = data.azurerm_client_config.current.object_id
 }
