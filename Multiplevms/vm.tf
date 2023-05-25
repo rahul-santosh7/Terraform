@@ -6,6 +6,8 @@ terraform {
     }
   }
 }
+
+
 terraform {
  backend "azurerm" {
 
@@ -28,6 +30,26 @@ provider "azurerm" {
 data "azurerm_client_config" "current" {
 
   
+}
+
+locals {
+  resource_ids = [
+"/subscriptions/738dfdc6-f0bd-407d-b899-c56640f7ce02/resourceGroups/newresource123",
+"/subscriptions/738dfdc6-f0bd-407d-b899-c56640f7ce02/resourceGroups/newresource123/providers/Microsoft.Network/virtualNetworks/my-virtual-network" ,
+"/subscriptions/738dfdc6-f0bd-407d-b899-c56640f7ce02/resourceGroups/newresource123/providers/Microsoft.Network/networkSecurityGroups/nsg2",
+"/subscriptions/738dfdc6-f0bd-407d-b899-c56640f7ce02/resourceGroups/newresource123/providers/Microsoft.Network/networkSecurityGroups/nsg1",
+"/subscriptions/738dfdc6-f0bd-407d-b899-c56640f7ce02/resourceGroups/newresource123/providers/Microsoft.Network/networkSecurityGroups/nsg3",
+
+    # Add more resource IDs as needed
+  ]
+}
+
+resource "null_resource" "import_resources" {
+  count = length(local.resource_ids)
+
+  provisioner "local-exec" {
+    command = "terraform import azurerm_virtual_machine.example[${count.index}] ${local.resource_ids[count.index]}"
+  }
 }
 
 resource "azurerm_resource_group" "newresource123" {
