@@ -27,30 +27,21 @@ provider "azurerm" {
   }
 
 }
+
+variable "myObjectId" {
+  default = "439b602a-a78d-47b5-93d2-adc7c0b96814"
+}
+
+variable "ADO_Service_Account_ObjectId" {
+  default = "7991a281-33bb-455a-9eb8-fe8ece4f0857"
+}
+
 data "azurerm_client_config" "current" {
 
   
 }
 
-locals {
-  resource_ids = [
-"/subscriptions/738dfdc6-f0bd-407d-b899-c56640f7ce02/resourceGroups/newresource123",
-"/subscriptions/738dfdc6-f0bd-407d-b899-c56640f7ce02/resourceGroups/newresource123/providers/Microsoft.Network/virtualNetworks/my-virtual-network" ,
-"/subscriptions/738dfdc6-f0bd-407d-b899-c56640f7ce02/resourceGroups/newresource123/providers/Microsoft.Network/networkSecurityGroups/nsg2",
-"/subscriptions/738dfdc6-f0bd-407d-b899-c56640f7ce02/resourceGroups/newresource123/providers/Microsoft.Network/networkSecurityGroups/nsg1",
-"/subscriptions/738dfdc6-f0bd-407d-b899-c56640f7ce02/resourceGroups/newresource123/providers/Microsoft.Network/networkSecurityGroups/nsg3",
 
-    # Add more resource IDs as needed
-  ]
-}
-
-resource "null_resource" "import_resources" {
-  count = length(local.resource_ids)
-
-  provisioner "local-exec" {
-    command = "terraform import azurerm_virtual_machine.example[${count.index}] ${local.resource_ids[count.index]}"
-  }
-}
 
 resource "azurerm_resource_group" "newresource123" {
   name     = var.resource_group_name
@@ -251,6 +242,8 @@ resource "azurerm_virtual_machine" "vms" {
   
 }
 
+
+
 resource "azurerm_key_vault" "example" {
   name                        = "vmkeyvalut23"
   location                    = var.location
@@ -259,27 +252,9 @@ resource "azurerm_key_vault" "example" {
   tenant_id                   = data.azurerm_client_config.current.tenant_id
   soft_delete_retention_days  = 7
   purge_protection_enabled    = false
-
   sku_name = "standard"
 
-  access_policy {
-    tenant_id = data.azurerm_client_config.current.tenant_id
-    object_id = data.azurerm_client_config.current.object_id
 
-    key_permissions = [
-      "Get","Create","Delete","List","Import"
-    ]
-
-    secret_permissions = [
-      "Get","Set","List","Delete","Restore","Recover","Purge"
-    ]
-
-    storage_permissions = [
-      "Get","Recover","Set"
-    ]
-
-    
-  }
   depends_on = [
       azurerm_resource_group.newresource123
     ]
@@ -290,6 +265,24 @@ resource "azurerm_key_vault" "example" {
   }
  
 }
+
+locals {
+  objectIds = {
+    currentid = data.azurerm_client_config.current.object_id
+    myid      = var.myObjectId
+    adoid     = var.ADO_Service_Account_ObjectId
+  }
+
+}
+resource "azurerm_key_vault_access_policy" "example" {
+  for_each           = local.objectIds
+  key_vault_id       = azurerm_key_vault.example.id
+  tenant_id          = data.azurerm_client_config.current.tenant_id
+  object_id          = each.value
+  secret_permissions = ["Get", "Set", "List", "Delete", "Recover", "Restore", "Set", "Purge"]
+
+}
+
 
 resource "random_string" "secret" {
   length  = 16
