@@ -11,8 +11,8 @@ terraform {
 terraform {
  backend "azurerm" {
 
- resource_group_name= "NetworkWatcherRG"
-storage_account_name= "kstg123"
+resource_group_name= "newresource123"
+storage_account_name= "statefile67"
 container_name = "rahul"
 key= "terraform.tfstate"
  }
@@ -28,13 +28,6 @@ provider "azurerm" {
 
 }
 
-variable "myObjectId" {
-  default = "439b602a-a78d-47b5-93d2-adc7c0b96814"
-}
-
-variable "ADO_Service_Account_ObjectId" {
-  default = "7991a281-33bb-455a-9eb8-fe8ece4f0857"
-}
 
 data "azurerm_client_config" "current" {
 
@@ -54,18 +47,6 @@ resource "azurerm_resource_group" "newresource123" {
  
 
 }
-
-variable "resource_group_name" {
-  description = "Name of the resource group"
-  default     = "newresource123"
-  
-}
-
-variable "location" {
-  description = "Azure region where the resources will be created"
-  default     = "West US"
-}
-
 
 variable "vms" {
   description = "List of VM names and their corresponding Linux publishers, offers, skus, versions, subnets, and NSGs"
@@ -266,14 +247,6 @@ resource "azurerm_key_vault" "example" {
  
 }
 
-locals {
-  objectIds = {
-    currentid = data.azurerm_client_config.current.object_id
-    myid      = var.myObjectId
-    adoid     = var.ADO_Service_Account_ObjectId
-  }
-
-}
 resource "azurerm_key_vault_access_policy" "example" {
   for_each           = local.objectIds
   key_vault_id       = azurerm_key_vault.example.id
