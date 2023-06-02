@@ -23,9 +23,10 @@ food:
   - apple
   -orange
   -carrot
-4) In YAML newline indicates the end of the field.
 
 
+
+4) In YAML newline indicates the end of the field
 
 ex:
 ----------
@@ -41,7 +42,6 @@ work_experience(key):
 
 Difference b/w yaml and json
 ----------------------------------------------
-
 
 json                                                                               
 --------
