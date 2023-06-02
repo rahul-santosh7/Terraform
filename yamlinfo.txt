@@ -1,0 +1,250 @@
+
+
+ YET ANOTHER MARKUP LANGUAGE
+----------------------------------------------------------
+
+1)Everything in  yaml is key value pair which makes user to easily write the code in understandable form.(its starts with --- which is not compulsory) 
+
+<key>: <value>
+
+key: is basically string
+value : can be string,number,array,multistring,boolean
+
+2) Every member in yaml document is member of one dictionary, While defining the submembers we use "space" as below.
+
+food:
+  - apple
+  -orange
+  -carrot
+
+3) YAML doesnt use tab characters for intendations it uses "spaces" insted and indentation can be with more spaces with nested key-value pairs
+
+food:
+  - apple
+  -orange
+  -carrot
+4) In YAML newline indicates the end of the field.
+
+
+
+ex:
+----------
+
+work_experience(key):
+  company_01(value): "xcompany"     
+     value: 01
+     role: "engineer"                                                      -------> This is dictionary because it has its own key value pair.
+  company_02(value): "ycompany"
+     value: 01
+     role: "engineer"
+
+
+Difference b/w yaml and json
+----------------------------------------------
+
+
+json                                                                               
+--------
+{                                                                                                   
+                                                                                              
+"name": "rahul",
+"job" : "engineer",
+"hobbies": [
+    "cricket",
+    "football",
+    "watching webseries"
+],
+"languages":{
+"pearl": "elite",
+"ruby":"elite",
+"java":"elite
+}
+
+}
+
+yaml
+---------
+name: rahul
+job: engineer
+hobbies: 
+   cricket
+   football
+   watching webeseries
+languages:
+  pearl:elite
+  java: elite
+  ruby:elite
+
+
+
+ Data Types
+------------------
+1) # for commenting the line
+2) Boolean : The value can be true or false
+--------------
+ex: 
+----
+Name: Rahul Santosh
+Gender:
+        - male: True
+        - women: False
+
+3) string
+------------
+ex:
+
+Name: Rahul Santosh
+
+4) Multiline string
+    ------------------------
+fold(>): using this character prints the string in same line(use >- to remove spaces)
+block(|): using this character prints the string in new line(use |- to remove spaces)
+
+who are you: >
+   iam rahul santosh 
+   and 
+  i work as devops engineer
+
+Output:
+---------
+iam rahul santosh and i work as devops engineer.
+
+who are you: |
+   iam rahul santosh 
+   and 
+   i work as devops engineer
+
+output:
+-----------
+iam rahul santosh 
+and 
+i work as devops engineer
+
+
+5) Dictionary
+--------------------
+ A dictionary is a data structure that allows us to store data in key-value pairs.
+
+
+instructions:
+  - name: server1
+    subject: pepito
+  - name: server2
+    subject: juanito
+
+
+output of dictionary:
+-------------------------------
+instructions:[{'name':'server1','subject':pepito},{'name':'server2','subject':'juanito'}]
+
+
+6) Null
+-----------
+Null datatype indicates null value and represented as ~ or unquoted none
+
+ex:
+--------
+
+name: ~
+value: ~
+
+ 7) List
+-----------
+which is used to represent list of elements.
+
+
+list_01: [ 1, 2, 3 ]
+list_02:
+  - 4
+  - 5
+  - 6
+list_03:
+  - "one"
+  - "two"
+  - "three"
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    name: http
+  - port: 443
+    name: https
+  - port: ~
+
+8) Block vs flow style
+--------------------------------
+
+we can define the data in 2 formats
+
+1) block style is one way where we define the elements y using "space".
+
+color: 
+---------
+  -red
+  -green
+  -yellow
+
+2) inline style is another way of defining the elements where [] is used to define the elements in single line and {} is used to map the data.
+
+color: [red,yellow,green]
+
+data:{ name:vikram, age:26 }
+
+
+
+9) set
+---------
+set items are preceded by ? like list items preceded by hyphens and we need to mention set after set name key.
+
+set has only values.
+
+ex:
+set_elements: !!set
+  ? 1
+  ? 2
+  ? 3
+
+10) Anchors: with & we can refer the dictionary of values in another area. Here below &restart policy is used as *restart_policy.
+
+services:
+  wordpress:
+    image: wordpress:latest
+    restart: &restart_policy always
+    environment: &env_vars
+      app: webservice
+      env: production
+  mysql:
+    image: mysql:3.8
+    restart: *restart_policy
+    environment: *env_vars
+
+11) Placeholders
+-------------------------
+Placeholders are used to reference variables inside yaml file which avoid hardcoded values and {{}} is used to reference this ex below it will get values from values.yaml.
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+  labels:
+    app: web
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: web
+
+
+values.yaml
+---------------------
+replicas: 2
+
+
+
+
+
+
+
+  
+     
