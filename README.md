@@ -65,7 +65,7 @@ provider "azurerm" {
 
 Data block
 --------------
-The data block is used to get the data like current configuration or subcription level information like below.
+The data block is used to get the data like current configuration or subcription level information like below
 
 data "azurerm_client_config" "current" {
 }
